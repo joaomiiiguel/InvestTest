@@ -2,13 +2,26 @@ import React, { useState } from 'react'
 import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native'
 import { useRoute } from '@react-navigation/native'
 import { TextMask, TextInputMask } from 'react-native-masked-text'
+import CardAction from '../components/CardAction'
 
 
 
 export default function Details() {
     const route = useRoute();
     const investment = route.params.investment
-    const [valueRescue, setValueRescue] = useState([])
+    const [valueRescue, setValueRescue] = useState(new Map)
+    const [valorInvalido, setValorInvalido] = useState(false)
+
+    function getValuesToRescue(){
+        if (!valueRescue.size){
+            alert('Map vazio')
+        }if(valorInvalido === true){
+            alert('Valor Inválido')
+        }if(valorInvalido === false && valueRescue.size){
+            alert('Resgate Efetuado')
+        }
+        console.log(valueRescue)
+    }
 
     return (
         <View style={styles.containerDetails}>
@@ -34,40 +47,24 @@ export default function Details() {
                 keyExtractor={action => String(action.id)}
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item: action }) => (
-                    <View style={{ marginBottom: 15 }}>
-                        <View style={styles.RowTitle}>
-                            <Text style={styles.boldText}>Ação</Text>
-                            <Text style={styles.titleInvest}>{action.nome}</Text>
-                        </View>
-                        <View style={styles.RowTitle}>
-                            <Text style={styles.boldText}>Saldo Acumulado</Text>
-
-                            <TextMask
-                                style={styles.titleInvest}
-                                type={'money'}
-                                value={(investment.saldoTotal * action.percentual) / 100}
-                            />
-                        </View>
-                        <View style={styles.ColumnTitle}>
-                            <Text style={styles.textSmall}>Valor a resgatar</Text>
-                            <TextInputMask
-                                style={styles.boldText}
-                                type={'money'}
-                                value={valueRescue}
-                                onChangeText={valueRescue => setValueRescue(valueRescue)}
-                            />
-                            {console.log((investment.saldoTotal * action.percentual) / 100) > console.log(valueRescue)
-                                ?
-                                console.log('dal')
-                                :
-                                console.log('erro')
-                                // <Text style={styles.msgAlert}>Valor não pode ser maior que <TextMask type={'money'} value={(investment.saldoTotal * action.percentual) / 100} /></Text>
+                    <CardAction
+                        id={action.id}
+                        NomeAcao={action.nome}
+                        saldoAcumulado={(investment.saldoTotal * action.percentual) / 100}
+                        onChangeResgate={(rawText, id) => { 
+                            if(rawText > (investment.saldoTotal * action.percentual) / 100){
+                                setValorInvalido(true)
+                            }else{
+                                setValorInvalido(false)
+                                setValueRescue(new Map(valueRescue.set(id, rawText))) }
                             }
-                        </View>
-                    </View>
+                        }
+                        valorInvalido={valorInvalido}
+                        setValorInvalido={setValorInvalido}
+                    />
                 )}
             />
-            <TouchableOpacity style={styles.buttonConfirm}>
+            <TouchableOpacity style={styles.buttonConfirm} onPress={() => getValuesToRescue()} >
                 <Text style={styles.titleBtn}>CONFIRMAR RESGATE</Text>
             </TouchableOpacity>
         </View>
@@ -120,7 +117,7 @@ const styles = StyleSheet.create({
         color: '#fc8080',
         fontWeight: 'bold'
     },
-    buttonConfirm:{
+    buttonConfirm: {
         width: '100%',
         backgroundColor: '#FFD700',
         display: 'flex',
@@ -130,7 +127,7 @@ const styles = StyleSheet.create({
         marginBottom: 25,
         marginTop: 15
     },
-    titleBtn:{
+    titleBtn: {
         fontWeight: 'bold',
         fontSize: 15,
         color: '#005aa5'

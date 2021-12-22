@@ -31,8 +31,9 @@ export default function Home({ navigation }) {
                 data={dataListInvestments}
                 showsVerticalScrollIndicator={false}
                 keyExtractor={investment => String(uuid.v4())}
-                renderItem={({ item: investment }) => (
+                renderItem={({ item: investment, index }) => (
                     <CardRescue
+                        index={index}
                         NameInvestment={investment.nome}
                         ValueInvestment={investment.saldoTotal}
                         DescriptionInvestment={investment.objetivo}
