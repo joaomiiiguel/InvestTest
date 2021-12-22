@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, Text, View, FlatList } from 'react-native'
+import { StyleSheet, Text, View, FlatList, ActivityIndicator, ScrollView } from 'react-native'
 import CardRescue from '../components/CardRescue';
 import api from '../services/api'
 import uuid from 'react-native-uuid';
@@ -7,7 +7,7 @@ import uuid from 'react-native-uuid';
 
 export default function Home({ navigation }) {
     const [dataListInvestments, setDataListInvestments] = useState([]);
-
+    const [loading, setLoading] = useState(true)
 
     async function getApiGit() {
         await api.get('/7b2dfe42-37a3-4094-b7ce-8ee4f8012f30')
@@ -21,14 +21,11 @@ export default function Home({ navigation }) {
 
     useEffect(() => {
         getApiGit()
+        setLoading(false)
     }, [])
 
-    return (
-        <View style={styles.container}>
-            <View style={styles.headerList}>
-                <Text style={styles.titleHeader}>INVESTIMENTOS</Text>
-                <Text style={styles.titleHeader}>R$</Text>
-            </View>
+    function ListInvestments() {
+        return (
             <FlatList
                 style={styles.listInvest}
                 data={dataListInvestments}
@@ -44,6 +41,26 @@ export default function Home({ navigation }) {
                     />
                 )}
             />
+        )
+    }
+
+    function LoadingPage() {
+        return (
+            <View >
+                <ActivityIndicator color="#005aa5" size="large"/>
+            </View>
+        )
+    }
+
+    return (
+        <View style={styles.container}>
+            <View style={styles.headerList}>
+                <Text style={styles.titleHeader}>INVESTIMENTOS</Text>
+                <Text style={styles.titleHeader}>R$</Text>
+            </View>
+
+            { loading ? <LoadingPage /> : <ListInvestments /> }
+
         </View>
     )
 }
