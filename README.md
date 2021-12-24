@@ -3,8 +3,8 @@
 Esse é o projeto de aplicativo de investimento em React Native.
 
 ## Tecnologia Usada
-- **[React Native](https://reactnative.dev)**React Native
-- **[Expo](https://docs.expo.dev)**Expo
+- **[React Native](https://reactnative.dev)**
+- **[Expo](https://docs.expo.dev)**
 
 ## Requerimentos de software local
 - **[Node](https://nodejs.org/en/)**
@@ -33,6 +33,5 @@ $ yarn
 Para rodar a aplicação do front-end no ambiente desejado, basta digitar o comando:
 
 ```bash
-# Para dar um start no ambiente Local da aplicação
-$ yarn start
+yarn start
 ```
