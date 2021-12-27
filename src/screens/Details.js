@@ -5,7 +5,6 @@ import { TextMask } from 'react-native-masked-text'
 import CardAction from '../components/CardAction'
 import ModalMessenge from '../components/Modal'
 
-
 export default function Details({ navigation }) {
     const route = useRoute();
     const investment = route.params.investment
@@ -14,7 +13,6 @@ export default function Details({ navigation }) {
     const [modalVisibleError, setModalVisibleError] = useState(false);
     const [modalVisibleVazio, setModalVisibleVazio] = useState(false);
     const [modalVisibleConfirm, setModalVisibleConfirm] = useState(false);
-    const [listaTotalResgate, setListaTotalResgate] = useState([])
     const [saldoTotal, setSaldoTotal] = useState(0)
 
     const getInvalidInvestment = () => {
@@ -33,7 +31,7 @@ export default function Details({ navigation }) {
                 if (nome && valorInvalido.get(id)) {
                     const value = (investment.saldoTotal * acao.percentual) / 100; 
                     const obj = { nome, value }
-                    const str = `${nome}: Valor máximo de R$${value} \n \n`
+                    const str = `${nome}: Valor máximo de R$${value.toFixed(2)} \n \n`
                     stringResult = stringResult.concat(str); 
                     result.push(obj);
                 }
@@ -43,8 +41,6 @@ export default function Details({ navigation }) {
     }; 
     //Função para verificar as regras do resgate
     function getValuesToRescue() {
-        
-        console.log(valorInvalido); 
      
         //Verifica se nenhum input está vazio
         if (!valueRescue.size) {
@@ -102,7 +98,7 @@ export default function Details({ navigation }) {
                         id={action.id}
                         NomeAcao={action.nome}
                         saldoAcumulado={(investment.saldoTotal * action.percentual) / 100}
-                        onSubmitValueResgate={(rawText, id) => {
+                        onChangeResgate={(rawText, id) => {
 
                             const invalido = rawText > (investment.saldoTotal * action.percentual) / 100; 
                             setValueRescue(new Map(valueRescue.set(id, rawText)))

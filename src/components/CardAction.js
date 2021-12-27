@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import { TextMask, TextInputMask } from 'react-native-masked-text'
 
 
-export default function CardAction({ NomeAcao, saldoAcumulado, id, setValorInvalido, valorInvalido, onSubmitValueResgate, ref }) {
+export default function CardAction({ NomeAcao, saldoAcumulado, id, setValorInvalido, valorInvalido, onSubmitValueResgate, ref, onChangeResgate }) {
     const [valorResgate, setValorResgate] = useState(0)
     const [saldoValidoResgate, setSaldoValidoResgate] = useState(0)
 
@@ -29,13 +29,12 @@ export default function CardAction({ NomeAcao, saldoAcumulado, id, setValorInval
                     type={'money'}
                     value={valorResgate}
                     ref={ref}
-                    onSubmitEditing={({nativeEvent}) => onSubmitValueResgate(valorResgate, id)}
                     placeholder='R$0,00'
                     includeRawValueInChangeText={true}
                     onChangeText={(text, rawText) => {
                         setSaldoValidoResgate(rawText)
                         setValorResgate(rawText);
-                        // onChangeResgate(rawText, id);
+                        onChangeResgate(rawText, id);
                     }}
                 />
 
