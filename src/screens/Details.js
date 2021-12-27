@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, ScrollView, Keyboard } from 'react-native'
 import { useRoute } from '@react-navigation/native'
 import { TextMask } from 'react-native-masked-text'
@@ -9,37 +9,67 @@ import ModalMessenge from '../components/Modal'
 export default function Details({ navigation }) {
     const route = useRoute();
     const investment = route.params.investment
-    const [valueRescue, setValueRescue] = useState(new Map)
-    const [valorInvalido, setValorInvalido] = useState(false)
+    const [valueRescue, setValueRescue] = useState(new Map())
+    const [valorInvalido, setValorInvalido] = useState(new Map())
     const [modalVisibleError, setModalVisibleError] = useState(false);
     const [modalVisibleVazio, setModalVisibleVazio] = useState(false);
     const [modalVisibleConfirm, setModalVisibleConfirm] = useState(false);
     const [listaTotalResgate, setListaTotalResgate] = useState([])
-
     const [saldoTotal, setSaldoTotal] = useState(0)
-    
+
+    const getInvalidInvestment = () => {
+        const result = []
+
+        let stringResult = '\n'; 
+
+        const invalidValues = Array.from(valorInvalido.keys()); 
+        for (let index = 0; index < invalidValues.length; index++) {
+            const id = invalidValues[index];
+            const acoes = Array.from(investment.acoes); 
+            if (acoes) {
+                const [ acao ] = acoes.filter((element) => element.id === id); 
+                const { nome } = acao; 
+                
+                if (nome && valorInvalido.get(id)) {
+                    const value = (investment.saldoTotal * acao.percentual) / 100; 
+                    const obj = { nome, value }
+                    const str = `${nome}: Valor máximo de R$${value} \n \n`
+                    stringResult = stringResult.concat(str); 
+                    result.push(obj);
+                }
+            }
+        }
+        return stringResult; 
+    }; 
     //Função para verificar as regras do resgate
     function getValuesToRescue() {
+        
+        console.log(valorInvalido); 
+     
         //Verifica se nenhum input está vazio
         if (!valueRescue.size) {
             setModalVisibleVazio(true)
         }
         //Verifica se algum valor preenchido está inválido
-        if (valorInvalido === true) {
+        if (Array.from(valorInvalido.values()).some(value => value === true) ) {
             setModalVisibleError(true)
         }
         //Realiza o resgate
-        if (valorInvalido === false && valueRescue.size) {
+        if (Array.from(valorInvalido.values()).every(value => value === false) && valueRescue.size) {
             setModalVisibleConfirm(true)
         }
     }
     
 
-    
-
+   
     function somaValores(){
-        const result = listaTotalResgate.reduce((acc, numero) => acc + numero, 0);
-        setSaldoTotal(result)
+
+        
+        if (valueRescue.size !== 0) {
+            const adder = (previousValue, currentValue) => previousValue + currentValue;
+            const sum = Array.from(valueRescue.values()).reduce(adder); 
+            setSaldoTotal(sum); 
+        }
     }
     useEffect(() => {
         somaValores()
@@ -72,17 +102,13 @@ export default function Details({ navigation }) {
                         id={action.id}
                         NomeAcao={action.nome}
                         saldoAcumulado={(investment.saldoTotal * action.percentual) / 100}
-                        onChangeResgate={(rawText, id) => {
-                            if (rawText > (investment.saldoTotal * action.percentual) / 100) {
-                                setValorInvalido(true)
-                            } else {
-                                setValorInvalido(false)
-                                setValueRescue(new Map(valueRescue.set(id, rawText)))
-                            }
-                        }
-                        }
+                        onSubmitValueResgate={(rawText, id) => {
 
-                        onSubmitValueResgate={(valorResgate) => setListaTotalResgate(state => [...state, valorResgate])}
+                            const invalido = rawText > (investment.saldoTotal * action.percentual) / 100; 
+                            setValueRescue(new Map(valueRescue.set(id, rawText)))
+                            setValorInvalido(new Map(valorInvalido.set(id, invalido))); 
+
+                        }}
                         valorInvalido={valorInvalido}
                         setValorInvalido={setValorInvalido}
                     />
@@ -105,7 +131,8 @@ export default function Details({ navigation }) {
             <ModalMessenge
                 TitleModal={'DADOS INVÁLIDOS'}
                 TextButton={'CORRIGIR'}
-                descriptionModal={'Você preencheu um ou mais campos com valor acima do permitido'}
+                descriptionModal={`Você preencheu um ou mais campos com valor acima do permitido, `}
+                invalidValueModal={`${getInvalidInvestment()}`}
                 visibleModal={modalVisibleError}
                 onRequestClose={() => setModalVisibleError(!modalVisibleError)}
                 onPressButton={() => setModalVisibleError(!modalVisibleError)}

@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, Text, View, Modal, TouchableOpacity } from 'react-native'
 
-export default function modalMessenge({ visibleModal, onRequestClose, TitleModal, TextButton, onPressButton, descriptionModal }) {
+export default function modalMessenge({ visibleModal, onRequestClose, TitleModal, TextButton, onPressButton, descriptionModal, invalidValueModal }) {
     return (
         <Modal
             animationType='fade'
@@ -12,6 +12,7 @@ export default function modalMessenge({ visibleModal, onRequestClose, TitleModal
                 <View style={styles.modalView}>
                     <Text style={styles.modalTitleText}>{TitleModal}</Text>
                     <Text style={styles.textDescription}>{descriptionModal}</Text>
+                    <Text style={styles.textDescription}>{invalidValueModal}</Text>
                     <TouchableOpacity
                         style={[styles.buttonConfirm]}
                         onPress={onPressButton}>
